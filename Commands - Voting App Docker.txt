@@ -1,0 +1,20 @@
+yum install git -y
+git clone https://github.com/RahulKakkarath/Voting-App-Docker.git
+yum install docker -y
+systemctl start docker
+cd Voting-App-Docker/vote
+docker build -t vote .
+cd ../worker
+docker build -t worker .
+cd ../result
+docker build -t result .
+docker run -d --name redis -h redis redis
+docker run -d --name postgres -h postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres postgres
+docker run -d -p 1000:80 --link redis:redis vote
+docker run -d --link redis:redis --link postgres:db worker
+docker run -d -p 2000:80 --link postgres:db result
+
+
+Port Numbers
+Voting App -: 1000
+Result     -: 2000
